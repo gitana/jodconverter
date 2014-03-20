@@ -111,7 +111,7 @@ public class OfficeUtils
             // program/soffice. Handle both cases!
             File executableFile = new File(officeHome, "MacOS/soffice.bin");
             if (!executableFile.isFile()) {
-                executableFile = new File(officeHome, "program/soffice");
+                executableFile = new File(officeHome, "MacOS/soffice");
             }
             return executableFile;
         } else if (PlatformUtils.isWindows()) {
