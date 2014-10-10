@@ -6,7 +6,7 @@
 
   <groupId>org.artofsolving.jodconverter</groupId>
   <artifactId>jodconverter-sample-webapp</artifactId>
-  <version>3.0-SNAPSHOT</version>
+  <version>3.0-CLOUDCMS-SNAPSHOT</version>
   <packaging>war</packaging>
 
   <name>JODConverter - Sample Web Application</name>
