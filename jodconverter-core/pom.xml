@@ -93,6 +93,13 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <!-- for more robust process management -->
+      <groupId>org.hyperic</groupId>
+      <artifactId>sigar-dist</artifactId>
+      <version>1.6.5.132</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
       <!-- for JSON configuration -->
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
@@ -118,8 +125,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.7</source>
+          <target>1.7</target>
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
@@ -128,10 +135,37 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.7.2</version>
         <configuration>
+          <!-- path to LibreOffice installation path -->
+          <argLine>-Doffice.home="C:\libreoffice\LibreOffice 4.2.6-secfix"</argLine>
           <!-- don't run tests in parallel -->
           <perCoreThreadCount>false</perCoreThreadCount>
           <threadCount>1</threadCount>
         </configuration>
+      </plugin>
+      <plugin>
+        <!-- If Eclipse complains about this plugin, there's an M2e connector available -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.2</version>
+        <executions>
+          <execution>
+            <id>unpack-dependencies</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <includes>**/sigar-bin/lib/*</includes>
+              <excludes>**/sigar-bin/lib/*jar</excludes>
+              <includeGroupIds>org.hyperic</includeGroupIds>
+              <includeArtifactIds>sigar-dist</includeArtifactIds>
+              <outputDirectory>
+                ${project.build.directory}/depends
+                <!-- or: ${project.basedir}/depends -->
+              </outputDirectory>
+              </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
