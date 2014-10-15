@@ -19,6 +19,12 @@
       <name>GNU Lesser General Public License, Version 3 or later</name>
       <url>http://www.gnu.org/licenses/lgpl.html</url>
     </license>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+      <comments>A business-friendly OSS license</comments>
+    </license>
   </licenses>
   <scm>
     <url>http://jodconverter.googlecode.com/svn/trunk/jodconverter-core</url>
@@ -45,6 +51,11 @@
 
   <repositories>
     <repository>
+      <!-- Made on purpose for LibreOffice 4.2.6-secfix jars, using maven install-file plugin -->
+      <id>uno-local-repo</id>
+      <url>file://${basedir}/src/main/resources/uno-repo/</url>
+    </repository>
+    <repository>
       <!-- required for org.hyperic:sigar -->
       <id>jboss-public-repository-group</id>
       <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
@@ -60,6 +71,7 @@
       <artifactId>commons-io</artifactId>
       <version>1.4</version>
     </dependency>
+<!--
     <dependency>
       <groupId>org.openoffice</groupId>
       <artifactId>juh</artifactId>
@@ -75,7 +87,33 @@
       <artifactId>unoil</artifactId>
       <version>3.2.1</version>
     </dependency>
+-->
 
+    <dependency>
+      <groupId>org.libreoffice</groupId>
+      <artifactId>ridl</artifactId>
+      <version>4.2.6-secfix</version>
+    </dependency>
+    <dependency>
+      <groupId>org.libreoffice</groupId>
+      <artifactId>juh</artifactId>
+      <version>4.2.6-secfix</version>
+    </dependency>
+    <dependency>
+      <groupId>org.libreoffice</groupId>
+      <artifactId>unoil</artifactId>
+      <version>4.2.6-secfix</version>
+    </dependency>
+    <dependency>
+      <groupId>org.libreoffice</groupId>
+      <artifactId>java_uno</artifactId>
+      <version>4.2.6-secfix</version>
+    </dependency>
+    <dependency>
+      <groupId>org.libreoffice</groupId>
+      <artifactId>unoloader</artifactId>
+      <version>4.2.6-secfix</version>
+    </dependency>
     <!-- Optional dependencies -->
 
     <dependency>
@@ -143,7 +181,7 @@
         </configuration>
       </plugin>
       <plugin>
-        <!-- If Eclipse complains about this plugin, there's an M2e connector available -->
+        <!-- In case Eclipse complains about this plugin, there's an M2e connector available -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <version>2.2</version>
@@ -163,7 +201,7 @@
                 ${project.build.directory}/depends
                 <!-- or: ${project.basedir}/depends -->
               </outputDirectory>
-              </configuration>
+            </configuration>
           </execution>
         </executions>
       </plugin>
