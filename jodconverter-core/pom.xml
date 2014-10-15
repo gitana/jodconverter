@@ -101,6 +101,11 @@
     </dependency>
     <dependency>
       <groupId>org.libreoffice</groupId>
+      <artifactId>jurt</artifactId>
+      <version>4.2.6-secfix</version>
+    </dependency>
+    <dependency>
+      <groupId>org.libreoffice</groupId>
       <artifactId>unoil</artifactId>
       <version>4.2.6-secfix</version>
     </dependency>
