@@ -12,57 +12,51 @@
 //
 package org.artofsolving.jodconverter.document;
 
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-public class SimpleDocumentFormatRegistry implements DocumentFormatRegistry
-{
-    private List<DocumentFormat> documentFormats = new ArrayList<DocumentFormat>();
 
-    public void addFormat(DocumentFormat documentFormat)
-    {
-        this.documentFormats.add(documentFormat);
+public class SimpleDocumentFormatRegistry implements DocumentFormatRegistry {
+  private List<DocumentFormat> documentFormats = new ArrayList<>();
+  private Map<String,DocumentFormat>  extensions      = new HashMap<>();
+  private Map<String,DocumentFormat>  mediaTypes      = new HashMap<>();
+
+
+  public void addFormat(DocumentFormat documentFormat) {
+    this.documentFormats.add(documentFormat);
+    extensions.put(documentFormat.getExtension().toLowerCase(), documentFormat);
+    mediaTypes.put(documentFormat.getMediaType().toLowerCase(), documentFormat);
+  }
+
+  public DocumentFormat getFormatByExtension(String extension) {
+    if (extension == null) {
+      return null;
     }
 
-    public DocumentFormat getFormatByExtension(String extension)
-    {
-        if (extension == null) {
-            return null;
-        }
-        String lowerExtension = extension.toLowerCase();
-        // TODO keep a documentByExtension map instead
-        for (DocumentFormat format : this.documentFormats) {
-            if (format.getExtension().equals(lowerExtension)) {
-                return format;
-            }
-        }
-        return null;
+    return extensions.get(extension.toLowerCase());
+  }
+
+  public DocumentFormat getFormatByMediaType(String mediaType) {
+    if (mediaType == null) {
+      return null;
     }
 
-    public DocumentFormat getFormatByMediaType(String mediaType)
-    {
-        if (mediaType == null) {
-            return null;
-        }
-        // TODO keep a documentByMediaType map instead
-        for (DocumentFormat format : this.documentFormats) {
-            if (format.getMediaType().equals(mediaType)) {
-                return format;
-            }
-        }
-        return null;
-    }
+    return mediaTypes.get(mediaType);
+  }
 
-    public Set<DocumentFormat> getOutputFormats(DocumentFamily family)
-    {
-        Set<DocumentFormat> formats = new HashSet<DocumentFormat>();
-        for (DocumentFormat format : this.documentFormats) {
-            if (format.getStoreProperties(family) != null) {
-                formats.add(format);
-            }
-        }
-        return formats;
+  public Set<DocumentFormat> getOutputFormats(DocumentFamily family) {
+    Set<DocumentFormat> formats = new HashSet<DocumentFormat>();
+    for (DocumentFormat format : this.documentFormats) {
+      if (format.getStoreProperties(family) != null) {
+        formats.add(format);
+      }
     }
+    return formats;
+  }
+
 }
