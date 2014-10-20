@@ -41,6 +41,12 @@ public class JsonDocumentFormatRegistry extends SimpleDocumentFormatRegistry {
       format.setName(jsonFormat.getString("name"));
       format.setExtension(jsonFormat.getString("extension"));
       format.setMediaType(jsonFormat.getString("mediaType"));
+      if (jsonFormat.has("writable")) {
+        format.setWritable(jsonFormat.getBoolean("writable"));
+      }
+      if (jsonFormat.has("readable")) {
+        format.setReadable(jsonFormat.getBoolean("readable"));
+      }
       if (jsonFormat.has("inputFamily")) {
         format.setInputFamily(DocumentFamily.valueOf(jsonFormat.getString("inputFamily")));
       }

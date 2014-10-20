@@ -12,7 +12,6 @@
 //
 package org.artofsolving.jodconverter;
 
-import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
@@ -49,9 +48,20 @@ public class OfficeDocumentConverterFunctionalTest
             for (File inputFile : files) {
                 String inputExtension = FilenameUtils.getExtension(inputFile.getName());
                 DocumentFormat inputFormat = formatRegistry.getFormatByExtension(inputExtension);
-                assertNotNull(inputFormat, "unknown input format: " + inputExtension);
+                if (inputFormat == null) {
+                  System.out.println("unknown input format: " + inputExtension);
+                  continue;                  
+                }
+                if (!inputFormat.isReadable()) {
+                  System.out.println("unsupported input format: " + inputFormat.getExtension());
+                  continue;
+                }
                 Set<DocumentFormat> outputFormats = formatRegistry.getOutputFormats(inputFormat.getInputFamily());
                 for (DocumentFormat outputFormat : outputFormats) {
+                    if (!outputFormat.isWritable()) {
+                      System.out.println("unsupported output format: " + outputFormat.getExtension());
+                      continue;
+                    }
                     File outputFile = File.createTempFile("test", "." + outputFormat.getExtension());
                     outputFile.deleteOnExit();
                     System.out.printf("-- converting %s to %s... ", inputFormat.getExtension(), outputFormat

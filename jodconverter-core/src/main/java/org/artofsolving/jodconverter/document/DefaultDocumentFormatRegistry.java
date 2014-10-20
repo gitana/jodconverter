@@ -63,6 +63,8 @@ public class DefaultDocumentFormatRegistry extends SimpleDocumentFormatRegistry 
     DocumentFormat sxw = new DocumentFormat("OpenOffice.org 1.0 Text Document", "sxw", "application/vnd.sun.xml.writer");
     sxw.setInputFamily(DocumentFamily.TEXT);
     sxw.setStoreProperties(DocumentFamily.TEXT, Collections.singletonMap("FilterName", "StarOffice XML (Writer)"));
+    //TODO readable/writable formats should depend on Office version
+    sxw.setWritable(false);
     addFormat(sxw);
 
     DocumentFormat doc = new DocumentFormat("Microsoft Word", "doc", "application/msword");
@@ -104,6 +106,8 @@ public class DefaultDocumentFormatRegistry extends SimpleDocumentFormatRegistry 
     DocumentFormat sxc = new DocumentFormat("OpenOffice.org 1.0 Spreadsheet", "sxc", "application/vnd.sun.xml.calc");
     sxc.setInputFamily(DocumentFamily.SPREADSHEET);
     sxc.setStoreProperties(DocumentFamily.SPREADSHEET, Collections.singletonMap("FilterName", "StarOffice XML (Calc)"));
+    //TODO readable/writable formats should depend on Office version
+    sxc.setWritable(false);
     addFormat(sxc);
 
     DocumentFormat xls = new DocumentFormat("Microsoft Excel", "xls", "application/vnd.ms-excel");
@@ -141,6 +145,8 @@ public class DefaultDocumentFormatRegistry extends SimpleDocumentFormatRegistry 
     DocumentFormat sxi = new DocumentFormat("OpenOffice.org 1.0 Presentation", "sxi", "application/vnd.sun.xml.impress");
     sxi.setInputFamily(DocumentFamily.PRESENTATION);
     sxi.setStoreProperties(DocumentFamily.PRESENTATION, Collections.singletonMap("FilterName", "StarOffice XML (Impress)"));
+    //TODO readable/writable formats should depend on Office version
+    sxi.setWritable(false);
     addFormat(sxi);
 
     DocumentFormat ppt = new DocumentFormat("Microsoft PowerPoint", "ppt", "application/vnd.ms-powerpoint");
@@ -159,6 +165,7 @@ public class DefaultDocumentFormatRegistry extends SimpleDocumentFormatRegistry 
 
     DocumentFormat svg = new DocumentFormat("Scalable Vector Graphics", "svg", "image/svg+xml");
     svg.setStoreProperties(DocumentFamily.DRAWING, Collections.singletonMap("FilterName", "draw_svg_Export"));
+    svg.setWritable(false);
     addFormat(svg);
   }
 }

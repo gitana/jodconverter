@@ -24,6 +24,8 @@ public class DocumentFormat {
   private DocumentFamily                      inputFamily;
   private Map<String, ?>                      loadProperties;
   private Map<DocumentFamily, Map<String, ?>> storePropertiesByFamily;
+  private boolean                             canRead  = true;
+  private boolean                             canWrite = true;
 
 
   public DocumentFormat() {
@@ -39,7 +41,6 @@ public class DocumentFormat {
   public String getName() {
     return this.name;
   }
-
   public void setName(String name) {
     this.name = name;
   }
@@ -47,7 +48,6 @@ public class DocumentFormat {
   public String getExtension() {
     return this.extension;
   }
-
   public void setExtension(String extension) {
     this.extension = extension;
   }
@@ -55,15 +55,27 @@ public class DocumentFormat {
   public String getMediaType() {
     return this.mediaType;
   }
-
   public void setMediaType(String mediaType) {
     this.mediaType = mediaType;
+  }
+
+  public boolean isReadable() {
+    return canRead;
+  }
+  public void setReadable(boolean value) {
+    canRead = value;
+  }
+
+  public boolean isWritable() {
+    return canWrite;
+  }
+  public void setWritable(boolean value) {
+    canWrite = value;
   }
 
   public DocumentFamily getInputFamily() {
     return this.inputFamily;
   }
-
   public void setInputFamily(DocumentFamily documentFamily) {
     this.inputFamily = documentFamily;
   }
@@ -71,7 +83,6 @@ public class DocumentFormat {
   public Map<String, ?> getLoadProperties() {
     return this.loadProperties;
   }
-
   public void setLoadProperties(Map<String, ?> loadProperties) {
     this.loadProperties = loadProperties;
   }
@@ -79,7 +90,6 @@ public class DocumentFormat {
   public Map<DocumentFamily, Map<String, ?>> getStorePropertiesByFamily() {
     return this.storePropertiesByFamily;
   }
-
   public void setStorePropertiesByFamily(Map<DocumentFamily, Map<String, ?>> storePropertiesByFamily) {
     this.storePropertiesByFamily = storePropertiesByFamily;
   }
@@ -90,11 +100,11 @@ public class DocumentFormat {
     }
     this.storePropertiesByFamily.put(family, storeProperties);
   }
-
   public Map<String, ?> getStoreProperties(DocumentFamily family) {
     if (this.storePropertiesByFamily == null) {
       return null;
     }
     return this.storePropertiesByFamily.get(family);
   }
+
 }
