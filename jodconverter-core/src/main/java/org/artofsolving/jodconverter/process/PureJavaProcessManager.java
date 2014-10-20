@@ -12,15 +12,13 @@
 //
 package org.artofsolving.jodconverter.process;
 
-public class PureJavaProcessManager implements ProcessManager
-{
-    public long findPid(ProcessQuery query)
-    {
-        return PID_UNKNOWN;
-    }
 
-    public void kill(Process process, long pid)
-    {
-        process.destroy();
-    }
+public class PureJavaProcessManager implements ProcessManager {
+  public long findPid(ProcessQuery query) {
+    return PID_UNKNOWN;
+  }
+
+  public void kill(Process process, long pid) {
+    process.destroy();
+  }
 }

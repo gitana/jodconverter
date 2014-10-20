@@ -14,19 +14,17 @@ package org.artofsolving.jodconverter.process;
 
 import java.io.IOException;
 
-public interface ProcessManager
-{
-    public static final long PID_NOT_FOUND = -2;
+public interface ProcessManager {
+  public static final long PID_NOT_FOUND = -2;
+  public static final long PID_UNKNOWN   = -1;
 
-    public static final long PID_UNKNOWN = -1;
+  void kill(Process process, long pid) throws IOException;
 
-    void kill(Process process, long pid) throws IOException;
-
-    /**
-     * @param query
-     * @return the pid if found, {@link #PID_NOT_FOUND} if not, or {@link #PID_UNKNOWN} if this implementation is unable
-     *         to find out
-     * @throws IOException
-     */
-    long findPid(ProcessQuery query) throws IOException;
+  /**
+   * @param query
+   * @return the pid if found, {@link #PID_NOT_FOUND} if not, or
+   *         {@link #PID_UNKNOWN} if this implementation is unable to find out
+   * @throws IOException
+   */
+  long findPid(ProcessQuery query) throws IOException;
 }
