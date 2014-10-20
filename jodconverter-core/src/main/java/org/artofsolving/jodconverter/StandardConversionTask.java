@@ -12,6 +12,7 @@
 //
 package org.artofsolving.jodconverter;
 
+
 import static org.artofsolving.jodconverter.office.OfficeUtils.cast;
 
 import java.io.File;
@@ -25,56 +26,50 @@ import org.artofsolving.jodconverter.office.OfficeException;
 import com.sun.star.lang.XComponent;
 import com.sun.star.util.XRefreshable;
 
-public class StandardConversionTask extends AbstractConversionTask
-{
-    private final DocumentFormat outputFormat;
 
-    private Map<String, ? > defaultLoadProperties;
+public class StandardConversionTask extends AbstractConversionTask {
+  private final DocumentFormat outputFormat;
 
-    private DocumentFormat inputFormat;
+  private Map<String, ?>       defaultLoadProperties;
 
-    public StandardConversionTask(File inputFile, File outputFile, DocumentFormat outputFormat)
-    {
-        super(inputFile, outputFile);
-        this.outputFormat = outputFormat;
+  private DocumentFormat       inputFormat;
+
+  public StandardConversionTask(File inputFile, File outputFile, DocumentFormat outputFormat) {
+    super(inputFile, outputFile);
+    this.outputFormat = outputFormat;
+  }
+
+  public void setDefaultLoadProperties(Map<String, ?> defaultLoadProperties) {
+    this.defaultLoadProperties = defaultLoadProperties;
+  }
+
+  public void setInputFormat(DocumentFormat inputFormat) {
+    this.inputFormat = inputFormat;
+  }
+
+  @Override
+  protected void modifyDocument(XComponent document) throws OfficeException {
+    XRefreshable refreshable = cast(XRefreshable.class, document);
+    if (refreshable != null) {
+      refreshable.refresh();
     }
+  }
 
-    public void setDefaultLoadProperties(Map<String, ? > defaultLoadProperties)
-    {
-        this.defaultLoadProperties = defaultLoadProperties;
+  @Override
+  protected Map<String, ?> getLoadProperties(File inputFile) {
+    Map<String, Object> loadProperties = new HashMap<String, Object>();
+    if (this.defaultLoadProperties != null) {
+      loadProperties.putAll(this.defaultLoadProperties);
     }
+    if (this.inputFormat != null && this.inputFormat.getLoadProperties() != null) {
+      loadProperties.putAll(this.inputFormat.getLoadProperties());
+    }
+    return loadProperties;
+  }
 
-    public void setInputFormat(DocumentFormat inputFormat)
-    {
-        this.inputFormat = inputFormat;
-    }
-
-    @Override
-    protected void modifyDocument(XComponent document) throws OfficeException
-    {
-        XRefreshable refreshable = cast(XRefreshable.class, document);
-        if (refreshable != null) {
-            refreshable.refresh();
-        }
-    }
-
-    @Override
-    protected Map<String, ? > getLoadProperties(File inputFile)
-    {
-        Map<String, Object> loadProperties = new HashMap<String, Object>();
-        if (this.defaultLoadProperties != null) {
-            loadProperties.putAll(this.defaultLoadProperties);
-        }
-        if (this.inputFormat != null && this.inputFormat.getLoadProperties() != null) {
-            loadProperties.putAll(this.inputFormat.getLoadProperties());
-        }
-        return loadProperties;
-    }
-
-    @Override
-    protected Map<String, ? > getStoreProperties(File outputFile, XComponent document)
-    {
-        DocumentFamily family = OfficeDocumentUtils.getDocumentFamily(document);
-        return this.outputFormat.getStoreProperties(family);
-    }
+  @Override
+  protected Map<String, ?> getStoreProperties(File outputFile, XComponent document) {
+    DocumentFamily family = OfficeDocumentUtils.getDocumentFamily(document);
+    return this.outputFormat.getStoreProperties(family);
+  }
 }
