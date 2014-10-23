@@ -1,4 +1,3 @@
-//
 // JODConverter - Java OpenDocument Converter
 // Copyright 2004-2012 Mirko Nasato and contributors
 //
@@ -10,47 +9,39 @@
 // 2. The Apache License, Version 2.0
 //    -> http://www.apache.org/licenses/LICENSE-2.0.txt
 //
+//
 package org.artofsolving.jodconverter.office;
 
-public class ExternalOfficeManagerConfiguration
-{
-    private OfficeConnectionProtocol connectionProtocol = OfficeConnectionProtocol.SOCKET;
 
-    private int portNumber = 2002;
+public class ExternalOfficeManagerConfiguration {
+  private OfficeConnectionProtocol connectionProtocol = OfficeConnectionProtocol.SOCKET;
+  private int                      portNumber         = 2002;
+  private String                   pipeName           = "office";
+  private boolean                  connectOnStart     = true;
 
-    private String pipeName = "office";
+  
+  public ExternalOfficeManagerConfiguration setConnectionProtocol(OfficeConnectionProtocol connectionProtocol) {
+    this.connectionProtocol = connectionProtocol;
+    return this;
+  }
 
-    private boolean connectOnStart = true;
+  public ExternalOfficeManagerConfiguration setPortNumber(int portNumber) {
+    this.portNumber = portNumber;
+    return this;
+  }
 
-    public ExternalOfficeManagerConfiguration setConnectionProtocol(OfficeConnectionProtocol connectionProtocol)
-    {
-        this.connectionProtocol = connectionProtocol;
-        return this;
-    }
+  public ExternalOfficeManagerConfiguration setPipeName(String pipeName) {
+    this.pipeName = pipeName;
+    return this;
+  }
 
-    public ExternalOfficeManagerConfiguration setPortNumber(int portNumber)
-    {
-        this.portNumber = portNumber;
-        return this;
-    }
+  public ExternalOfficeManagerConfiguration setConnectOnStart(boolean connectOnStart) {
+    this.connectOnStart = connectOnStart;
+    return this;
+  }
 
-    public ExternalOfficeManagerConfiguration setPipeName(String pipeName)
-    {
-        this.pipeName = pipeName;
-        return this;
-    }
-
-    public ExternalOfficeManagerConfiguration setConnectOnStart(boolean connectOnStart)
-    {
-        this.connectOnStart = connectOnStart;
-        return this;
-    }
-
-    public OfficeManager buildOfficeManager()
-    {
-        UnoUrl unoUrl =
-            this.connectionProtocol == OfficeConnectionProtocol.SOCKET ? UnoUrl.socket(this.portNumber) : UnoUrl
-                .pipe(this.pipeName);
-        return new ExternalOfficeManager(unoUrl, this.connectOnStart);
-    }
+  public OfficeManager buildOfficeManager() {
+    UnoUrl unoUrl = this.connectionProtocol == OfficeConnectionProtocol.SOCKET ? UnoUrl.socket(this.portNumber) : UnoUrl.pipe(this.pipeName);
+    return new ExternalOfficeManager(unoUrl, this.connectOnStart);
+  }
 }

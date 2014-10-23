@@ -12,6 +12,7 @@
 //
 package org.artofsolving.jodconverter.office;
 
+
 /**
  * An OfficeManager knows how to execute {@link OfficeTask}s.
  * <p>

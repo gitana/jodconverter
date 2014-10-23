@@ -12,6 +12,7 @@
 //
 package org.artofsolving.jodconverter.office;
 
+
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -19,45 +20,42 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-class SuspendableThreadPoolExecutor extends ThreadPoolExecutor
-{
-    private boolean available = false;
 
-    private ReentrantLock suspendLock = new ReentrantLock();
+class SuspendableThreadPoolExecutor extends ThreadPoolExecutor {
+  private boolean       available          = false;
+  private ReentrantLock suspendLock        = new ReentrantLock();
+  private Condition     availableCondition = this.suspendLock.newCondition();
 
-    private Condition availableCondition = this.suspendLock.newCondition();
 
-    public SuspendableThreadPoolExecutor(ThreadFactory threadFactory)
-    {
-        super(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory);
+  public SuspendableThreadPoolExecutor(ThreadFactory threadFactory) {
+    super(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory);
+  }
+
+  @Override
+  protected void beforeExecute(Thread thread, Runnable task) {
+    super.beforeExecute(thread, task);
+    this.suspendLock.lock();
+    try {
+      while (!this.available) {
+        this.availableCondition.await();
+      }
+    } catch (InterruptedException interruptedException) {
+      thread.interrupt();
+    } finally {
+      this.suspendLock.unlock();
     }
+  }
 
-    @Override
-    protected void beforeExecute(Thread thread, Runnable task)
-    {
-        super.beforeExecute(thread, task);
-        this.suspendLock.lock();
-        try {
-            while (!this.available) {
-                this.availableCondition.await();
-            }
-        } catch (InterruptedException interruptedException) {
-            thread.interrupt();
-        } finally {
-            this.suspendLock.unlock();
-        }
+  public void setAvailable(boolean available) {
+    this.suspendLock.lock();
+    try {
+      this.available = available;
+      if (available) {
+        this.availableCondition.signalAll();
+      }
+    } finally {
+      this.suspendLock.unlock();
     }
+  }
 
-    public void setAvailable(boolean available)
-    {
-        this.suspendLock.lock();
-        try {
-            this.available = available;
-            if (available) {
-                this.availableCondition.signalAll();
-            }
-        } finally {
-            this.suspendLock.unlock();
-        }
-    }
 }

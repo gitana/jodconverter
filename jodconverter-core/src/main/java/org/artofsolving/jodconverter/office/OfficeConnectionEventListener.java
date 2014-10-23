@@ -12,11 +12,12 @@
 //
 package org.artofsolving.jodconverter.office;
 
+
 import java.util.EventListener;
 
-interface OfficeConnectionEventListener extends EventListener
-{
-    void connected(OfficeConnectionEvent event);
 
-    void disconnected(OfficeConnectionEvent event);
+interface OfficeConnectionEventListener extends EventListener {
+  void connected(OfficeConnectionEvent event);
+
+  void disconnected(OfficeConnectionEvent event);
 }

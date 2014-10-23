@@ -39,14 +39,31 @@ public class ProcessManagerTest
         assertEquals(pid, javaPid.longValue());
 
         processManager.kill(process, pid);
+        synchronized (this) {
+          try {
+            wait(2000);
+          } catch (InterruptedException e) { ; }
+        }
         assertEquals(processManager.findPid(query), ProcessManager.PID_NOT_FOUND);
     }
 
     public void sigarProcessManager() throws Exception
     {
         ProcessManager processManager = new SigarProcessManager();
-        Process process = new ProcessBuilder("sleep", "5s").start();
-        ProcessQuery query = new ProcessQuery("sleep", "5s");
+        Process process;
+        ProcessQuery query;
+        if (PlatformUtils.isWindows()) {
+          process = new ProcessBuilder("timeout", "/t 10").start();
+          query = new ProcessQuery("timeout", "/t 10");          
+        } else {
+          process = new ProcessBuilder("sleep", "10s").start();
+          query = new ProcessQuery("sleep", "10s");          
+        }
+        synchronized (this) {
+          try {
+            wait(4000);
+          } catch (InterruptedException e) { ; }
+        }
 
         long pid = processManager.findPid(query);
         assertFalse(pid == ProcessManager.PID_NOT_FOUND);
@@ -56,6 +73,11 @@ public class ProcessManagerTest
         }
 
         processManager.kill(process, pid);
+        synchronized (this) {
+          try {
+            wait(2000);
+          } catch (InterruptedException e) { ; }
+        }
         assertEquals(processManager.findPid(query), ProcessManager.PID_NOT_FOUND);
     }
 }

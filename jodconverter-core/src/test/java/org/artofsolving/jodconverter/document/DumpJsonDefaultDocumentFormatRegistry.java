@@ -47,6 +47,8 @@ class DumpJsonDefaultDocumentFormatRegistry
         jsonFormat.put("name", format.getName());
         jsonFormat.put("extension", format.getExtension());
         jsonFormat.put("mediaType", format.getMediaType());
+        jsonFormat.put("readable", format.isReadable());
+        jsonFormat.put("writable", format.isWritable());
         if (format.getInputFamily() != null) {
             jsonFormat.put("inputFamily", format.getInputFamily().name());
         }

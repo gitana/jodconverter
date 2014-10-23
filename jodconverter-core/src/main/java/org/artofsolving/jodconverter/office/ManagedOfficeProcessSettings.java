@@ -12,108 +12,87 @@
 //
 package org.artofsolving.jodconverter.office;
 
+
 import java.io.File;
 
 import org.artofsolving.jodconverter.process.ProcessManager;
 import org.artofsolving.jodconverter.process.PureJavaProcessManager;
 
-class ManagedOfficeProcessSettings
-{
-    public static final long DEFAULT_RETRY_INTERVAL = 250L;
 
-    private final UnoUrl unoUrl;
+class ManagedOfficeProcessSettings {
+  public static final long DEFAULT_RETRY_INTERVAL = 250L;
+  private final UnoUrl     unoUrl;
+  private File             officeHome             = OfficeUtils.getDefaultOfficeHome();
+  private String[]         runAsArgs;
+  private File             templateProfileDir;
+  private File             workDir                = new File(System.getProperty("java.io.tmpdir"));
+  private ProcessManager   processManager         = new PureJavaProcessManager();
+  private long             retryTimeout           = DefaultOfficeManagerConfiguration.DEFAULT_RETRY_TIMEOUT;
+  private long             retryInterval          = DEFAULT_RETRY_INTERVAL;
 
-    private File officeHome = OfficeUtils.getDefaultOfficeHome();
 
-    private String[] runAsArgs;
+  public ManagedOfficeProcessSettings(UnoUrl unoUrl) {
+    this.unoUrl = unoUrl;
+  }
 
-    private File templateProfileDir;
+  public UnoUrl getUnoUrl() {
+    return this.unoUrl;
+  }
 
-    private File workDir = new File(System.getProperty("java.io.tmpdir"));
+  public File getOfficeHome() {
+    return this.officeHome;
+  }
 
-    private ProcessManager processManager = new PureJavaProcessManager();
+  public void setOfficeHome(File officeHome) {
+    this.officeHome = officeHome;
+  }
 
-    private long retryTimeout = DefaultOfficeManagerConfiguration.DEFAULT_RETRY_TIMEOUT;
+  public String[] getRunAsArgs() {
+    return this.runAsArgs;
+  }
 
-    private long retryInterval = DEFAULT_RETRY_INTERVAL;
+  public void setRunAsArgs(String[] runAsArgs) {
+    this.runAsArgs = runAsArgs;
+  }
 
-    public ManagedOfficeProcessSettings(UnoUrl unoUrl)
-    {
-        this.unoUrl = unoUrl;
-    }
+  public File getTemplateProfileDir() {
+    return this.templateProfileDir;
+  }
 
-    public UnoUrl getUnoUrl()
-    {
-        return this.unoUrl;
-    }
+  public void setTemplateProfileDir(File templateProfileDir) {
+    this.templateProfileDir = templateProfileDir;
+  }
 
-    public File getOfficeHome()
-    {
-        return this.officeHome;
-    }
+  public File getWorkDir() {
+    return this.workDir;
+  }
 
-    public void setOfficeHome(File officeHome)
-    {
-        this.officeHome = officeHome;
-    }
+  public void setWorkDir(File workDir) {
+    this.workDir = workDir;
+  }
 
-    public String[] getRunAsArgs()
-    {
-        return this.runAsArgs;
-    }
+  public ProcessManager getProcessManager() {
+    return this.processManager;
+  }
 
-    public void setRunAsArgs(String[] runAsArgs)
-    {
-        this.runAsArgs = runAsArgs;
-    }
+  public void setProcessManager(ProcessManager processManager) {
+    this.processManager = processManager;
+  }
 
-    public File getTemplateProfileDir()
-    {
-        return this.templateProfileDir;
-    }
+  public long getRetryTimeout() {
+    return this.retryTimeout;
+  }
 
-    public void setTemplateProfileDir(File templateProfileDir)
-    {
-        this.templateProfileDir = templateProfileDir;
-    }
+  public void setRetryTimeout(long retryTimeout) {
+    this.retryTimeout = retryTimeout;
+  }
 
-    public File getWorkDir()
-    {
-        return this.workDir;
-    }
+  public long getRetryInterval() {
+    return this.retryInterval;
+  }
 
-    public void setWorkDir(File workDir)
-    {
-        this.workDir = workDir;
-    }
+  public void setRetryInterval(long retryInterval) {
+    this.retryInterval = retryInterval;
+  }
 
-    public ProcessManager getProcessManager()
-    {
-        return this.processManager;
-    }
-
-    public void setProcessManager(ProcessManager processManager)
-    {
-        this.processManager = processManager;
-    }
-
-    public long getRetryTimeout()
-    {
-        return this.retryTimeout;
-    }
-
-    public void setRetryTimeout(long retryTimeout)
-    {
-        this.retryTimeout = retryTimeout;
-    }
-
-    public long getRetryInterval()
-    {
-        return this.retryInterval;
-    }
-
-    public void setRetryInterval(long retryInterval)
-    {
-        this.retryInterval = retryInterval;
-    }
 }

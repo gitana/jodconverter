@@ -12,17 +12,16 @@
 //
 package org.artofsolving.jodconverter.office;
 
-public class OfficeException extends RuntimeException
-{
-    private static final long serialVersionUID = 1L;
 
-    public OfficeException(String message)
-    {
-        super(message);
-    }
+public class OfficeException extends RuntimeException {
+  private static final long serialVersionUID = -1360754252407765922L;
 
-    public OfficeException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+
+  public OfficeException(String message) {
+    super(message);
+  }
+
+  public OfficeException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

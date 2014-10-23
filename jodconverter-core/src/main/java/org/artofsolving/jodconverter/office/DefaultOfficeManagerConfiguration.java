@@ -1,4 +1,3 @@
-//
 // JODConverter - Java OpenDocument Converter
 // Copyright 2004-2012 Mirko Nasato and contributors
 //
@@ -10,9 +9,12 @@
 // 2. The Apache License, Version 2.0
 //    -> http://www.apache.org/licenses/LICENSE-2.0.txt
 //
+//
 package org.artofsolving.jodconverter.office;
 
+
 import java.io.File;
+import java.util.Objects;
 
 import org.artofsolving.jodconverter.process.LinuxProcessManager;
 import org.artofsolving.jodconverter.process.ProcessManager;
@@ -20,245 +22,209 @@ import org.artofsolving.jodconverter.process.PureJavaProcessManager;
 import org.artofsolving.jodconverter.process.SigarProcessManager;
 import org.artofsolving.jodconverter.util.PlatformUtils;
 
-public class DefaultOfficeManagerConfiguration
-{
-    public static final long DEFAULT_RETRY_TIMEOUT = 120000L;
 
-    private File officeHome = OfficeUtils.getDefaultOfficeHome();
+public class DefaultOfficeManagerConfiguration {
+  public static final long         DEFAULT_RETRY_TIMEOUT = 120000L;
+  private File                     officeHome            = OfficeUtils.getDefaultOfficeHome();
+  private OfficeConnectionProtocol connectionProtocol    = OfficeConnectionProtocol.SOCKET;
+  private int[]                    portNumbers           = new int[] { 2002 };
+  private String[]                 pipeNames             = new String[] { "office" };
+  private String[]                 runAsArgs             = null;
+  private File                     templateProfileDir    = null;
+  private File                     workDir               = new File(System.getProperty("java.io.tmpdir"));
+  private long                     taskQueueTimeout      = 30000L;                                        // 30 seconds
+  private long                     taskExecutionTimeout  = 120000L;                                       // 2 minutes
+  private int                      maxTasksPerProcess    = 200;
+  private long                     retryTimeout          = DEFAULT_RETRY_TIMEOUT;
+  private ProcessManager           processManager        = null;                                          // lazily initialised
 
-    private OfficeConnectionProtocol connectionProtocol = OfficeConnectionProtocol.SOCKET;
 
-    private int[] portNumbers = new int[] {2002};
+  public DefaultOfficeManagerConfiguration setOfficeHome(String officeHome) throws NullPointerException, IllegalArgumentException {
+    Objects.requireNonNull(officeHome, "officeHome must not be null");
+    return setOfficeHome(new File(officeHome));
+  }
 
-    private String[] pipeNames = new String[] {"office"};
+  public DefaultOfficeManagerConfiguration setOfficeHome(File officeHome) throws NullPointerException, IllegalArgumentException {
+    Objects.requireNonNull(officeHome, "officeHome must not be null");
+    checkArgument("officeHome", officeHome.isDirectory(), "must exist and be a directory");
+    this.officeHome = officeHome;
+    return this;
+  }
 
-    private String[] runAsArgs = null;
+  public DefaultOfficeManagerConfiguration setConnectionProtocol(OfficeConnectionProtocol connectionProtocol) throws NullPointerException {
+    Objects.requireNonNull(connectionProtocol, "connectionProtocol must not be null");
+    this.connectionProtocol = connectionProtocol;
+    return this;
+  }
 
-    private File templateProfileDir = null;
+  public DefaultOfficeManagerConfiguration setPortNumber(int portNumber) {
+    this.portNumbers = new int[] { portNumber };
+    return this;
+  }
 
-    private File workDir = new File(System.getProperty("java.io.tmpdir"));
+  public DefaultOfficeManagerConfiguration setPortNumbers(int... portNumbers) throws NullPointerException, IllegalArgumentException {
+    Objects.requireNonNull(portNumbers, "portNumbers must not be null");
+    checkArgument("portNumbers", portNumbers.length > 0, "must not be empty");
+    this.portNumbers = portNumbers;
+    return this;
+  }
 
-    private long taskQueueTimeout = 30000L; // 30 seconds
+  public DefaultOfficeManagerConfiguration setPipeName(String pipeName) throws NullPointerException {
+    Objects.requireNonNull(pipeName, "pipeName must not be null");
+    this.pipeNames = new String[] { pipeName };
+    return this;
+  }
 
-    private long taskExecutionTimeout = 120000L; // 2 minutes
+  public DefaultOfficeManagerConfiguration setPipeNames(String... pipeNames) throws NullPointerException, IllegalArgumentException {
+    Objects.requireNonNull(pipeNames, "pipeNames must not be null");
+    checkArgument("pipeNames", pipeNames.length > 0, "must not be empty");
+    this.pipeNames = pipeNames;
+    return this;
+  }
 
-    private int maxTasksPerProcess = 200;
+  public DefaultOfficeManagerConfiguration setRunAsArgs(String... runAsArgs) {
+    this.runAsArgs = runAsArgs;
+    return this;
+  }
 
-    private long retryTimeout = DEFAULT_RETRY_TIMEOUT;
+  public DefaultOfficeManagerConfiguration setTemplateProfileDir(File templateProfileDir) throws IllegalArgumentException {
+    if (templateProfileDir != null) {
+      checkArgument("templateProfileDir", templateProfileDir.isDirectory(), "must exist and be a directory");
+    }
+    this.templateProfileDir = templateProfileDir;
+    return this;
+  }
 
-    private ProcessManager processManager = null; // lazily initialised
+  /**
+   * Sets the directory where temporary office profiles will be created.
+   * <p>
+   * Defaults to the system temporary directory as specified by the
+   * <code>java.io.tmpdir</code> system property.
+   * 
+   * @param workDir
+   * @return
+   */
+  public DefaultOfficeManagerConfiguration setWorkDir(File workDir) {
+    Objects.requireNonNull(workDir, "workDir must not be null");
+    this.workDir = workDir;
+    return this;
+  }
 
-    public DefaultOfficeManagerConfiguration setOfficeHome(String officeHome) throws NullPointerException,
-        IllegalArgumentException
-    {
-        checkArgumentNotNull("officeHome", officeHome);
-        return setOfficeHome(new File(officeHome));
+  public DefaultOfficeManagerConfiguration setTaskQueueTimeout(long taskQueueTimeout) {
+    this.taskQueueTimeout = taskQueueTimeout;
+    return this;
+  }
+
+  public DefaultOfficeManagerConfiguration setTaskExecutionTimeout(long taskExecutionTimeout) {
+    this.taskExecutionTimeout = taskExecutionTimeout;
+    return this;
+  }
+
+  public DefaultOfficeManagerConfiguration setMaxTasksPerProcess(int maxTasksPerProcess) {
+    this.maxTasksPerProcess = maxTasksPerProcess;
+    return this;
+  }
+
+  /**
+   * Provide a specific {@link ProcessManager} implementation
+   * <p>
+   * The default is to use {@link SigarProcessManager} if sigar.jar is available
+   * in the classpath, otherwise {@link LinuxProcessManager} on Linux and
+   * {@link PureJavaProcessManager} on other platforms.
+   * 
+   * @param processManager
+   * @return
+   * @throws NullPointerException
+   */
+  public DefaultOfficeManagerConfiguration setProcessManager(ProcessManager processManager) throws NullPointerException {
+    Objects.requireNonNull(processManager, "processManager must not be null");
+    this.processManager = processManager;
+    return this;
+  }
+
+  /**
+   * Retry timeout set in milliseconds. Used for retrying office process calls.
+   * If not set, it defaults to 2 minutes
+   * 
+   * @param retryTimeout
+   *          in milliseconds
+   * @return
+   */
+  public DefaultOfficeManagerConfiguration setRetryTimeout(long retryTimeout) {
+    this.retryTimeout = retryTimeout;
+    return this;
+  }
+
+  public OfficeManager buildOfficeManager() throws IllegalStateException {
+    if (this.officeHome == null) {
+      throw new IllegalStateException("officeHome not set and could not be auto-detected");
+    } else if (!this.officeHome.isDirectory()) {
+      throw new IllegalStateException("officeHome doesn't exist or is not a directory: " + this.officeHome);
+    } else if (!OfficeUtils.getOfficeExecutable(this.officeHome).isFile()) {
+      throw new IllegalStateException("invalid officeHome: it doesn't contain soffice.bin: " + this.officeHome);
+    }
+    if (this.templateProfileDir != null && !isValidProfileDir(this.templateProfileDir)) {
+      throw new IllegalStateException("templateProfileDir doesn't appear to contain a user profile: " + this.templateProfileDir);
+    }
+    if (!this.workDir.isDirectory()) {
+      throw new IllegalStateException("workDir doesn't exist or is not a directory: " + this.workDir);
     }
 
-    public DefaultOfficeManagerConfiguration setOfficeHome(File officeHome) throws NullPointerException,
-        IllegalArgumentException
-    {
-        checkArgumentNotNull("officeHome", officeHome);
-        checkArgument("officeHome", officeHome.isDirectory(), "must exist and be a directory");
-        this.officeHome = officeHome;
-        return this;
+    if (this.processManager == null) {
+      this.processManager = findBestProcessManager();
     }
 
-    public DefaultOfficeManagerConfiguration setConnectionProtocol(OfficeConnectionProtocol connectionProtocol)
-        throws NullPointerException
-    {
-        checkArgumentNotNull("connectionProtocol", connectionProtocol);
-        this.connectionProtocol = connectionProtocol;
-        return this;
+    int numInstances = this.connectionProtocol == OfficeConnectionProtocol.PIPE ? this.pipeNames.length : this.portNumbers.length;
+    UnoUrl[] unoUrls = new UnoUrl[numInstances];
+    for (int i = 0; i < numInstances; i++) {
+      unoUrls[i] = (this.connectionProtocol == OfficeConnectionProtocol.PIPE) ? UnoUrl.pipe(this.pipeNames[i]) : UnoUrl.socket(this.portNumbers[i]);
     }
+    return new ProcessPoolOfficeManager(
+        this.officeHome, unoUrls, this.runAsArgs, this.templateProfileDir, this.workDir, this.retryTimeout,
+        this.taskQueueTimeout, this.taskExecutionTimeout, this.maxTasksPerProcess, this.processManager);
+  }
 
-    public DefaultOfficeManagerConfiguration setPortNumber(int portNumber)
-    {
-        this.portNumbers = new int[] {portNumber};
-        return this;
+  private ProcessManager findBestProcessManager() {
+    if (isSigarAvailable()) {
+      return new SigarProcessManager();
+    } else if (PlatformUtils.isLinux()) {
+      LinuxProcessManager processManager = new LinuxProcessManager();
+      if (this.runAsArgs != null) {
+        processManager.setRunAsArgs(this.runAsArgs);
+      }
+      return processManager;
+    } else {
+      // NOTE: UnixProcessManager can't be trusted to work on Solaris
+      // because of the 80-char limit on ps output there
+      return new PureJavaProcessManager();
     }
+  }
 
-    public DefaultOfficeManagerConfiguration setPortNumbers(int... portNumbers) throws NullPointerException,
-        IllegalArgumentException
-    {
-        checkArgumentNotNull("portNumbers", portNumbers);
-        checkArgument("portNumbers", portNumbers.length > 0, "must not be empty");
-        this.portNumbers = portNumbers;
-        return this;
+  private boolean isSigarAvailable() {
+    try {
+      Class.forName("org.hyperic.sigar.Sigar", false, getClass().getClassLoader());
+      return true;
+    } catch (ClassNotFoundException classNotFoundException) {
+      return false;
     }
+  }
 
-    public DefaultOfficeManagerConfiguration setPipeName(String pipeName) throws NullPointerException
-    {
-        checkArgumentNotNull("pipeName", pipeName);
-        this.pipeNames = new String[] {pipeName};
-        return this;
+  // private void checkArgumentNotNull(String argName, Object argValue) throws
+  // NullPointerException
+  // {
+  // if (argValue == null) {
+  // throw new NullPointerException(argName + " must not be null");
+  // }
+  // }
+
+  private void checkArgument(String argName, boolean condition, String message) throws IllegalArgumentException {
+    if (!condition) {
+      throw new IllegalArgumentException(argName + " " + message);
     }
+  }
 
-    public DefaultOfficeManagerConfiguration setPipeNames(String... pipeNames) throws NullPointerException,
-        IllegalArgumentException
-    {
-        checkArgumentNotNull("pipeNames", pipeNames);
-        checkArgument("pipeNames", pipeNames.length > 0, "must not be empty");
-        this.pipeNames = pipeNames;
-        return this;
-    }
+  private boolean isValidProfileDir(File profileDir) {
+    return new File(profileDir, "user").isDirectory();
+  }
 
-    public DefaultOfficeManagerConfiguration setRunAsArgs(String... runAsArgs)
-    {
-        this.runAsArgs = runAsArgs;
-        return this;
-    }
-
-    public DefaultOfficeManagerConfiguration setTemplateProfileDir(File templateProfileDir)
-        throws IllegalArgumentException
-    {
-        if (templateProfileDir != null) {
-            checkArgument("templateProfileDir", templateProfileDir.isDirectory(), "must exist and be a directory");
-        }
-        this.templateProfileDir = templateProfileDir;
-        return this;
-    }
-
-    /**
-     * Sets the directory where temporary office profiles will be created.
-     * <p>
-     * Defaults to the system temporary directory as specified by the <code>java.io.tmpdir</code> system property.
-     * 
-     * @param workDir
-     * @return
-     */
-    public DefaultOfficeManagerConfiguration setWorkDir(File workDir)
-    {
-        checkArgumentNotNull("workDir", workDir);
-        this.workDir = workDir;
-        return this;
-    }
-
-    public DefaultOfficeManagerConfiguration setTaskQueueTimeout(long taskQueueTimeout)
-    {
-        this.taskQueueTimeout = taskQueueTimeout;
-        return this;
-    }
-
-    public DefaultOfficeManagerConfiguration setTaskExecutionTimeout(long taskExecutionTimeout)
-    {
-        this.taskExecutionTimeout = taskExecutionTimeout;
-        return this;
-    }
-
-    public DefaultOfficeManagerConfiguration setMaxTasksPerProcess(int maxTasksPerProcess)
-    {
-        this.maxTasksPerProcess = maxTasksPerProcess;
-        return this;
-    }
-
-    /**
-     * Provide a specific {@link ProcessManager} implementation
-     * <p>
-     * The default is to use {@link SigarProcessManager} if sigar.jar is available in the classpath, otherwise
-     * {@link LinuxProcessManager} on Linux and {@link PureJavaProcessManager} on other platforms.
-     * 
-     * @param processManager
-     * @return
-     * @throws NullPointerException
-     */
-    public DefaultOfficeManagerConfiguration setProcessManager(ProcessManager processManager)
-        throws NullPointerException
-    {
-        checkArgumentNotNull("processManager", processManager);
-        this.processManager = processManager;
-        return this;
-    }
-
-    /**
-     * Retry timeout set in milliseconds. Used for retrying office process calls. If not set, it defaults to 2 minutes
-     * 
-     * @param retryTimeout in milliseconds
-     * @return
-     */
-    public DefaultOfficeManagerConfiguration setRetryTimeout(long retryTimeout)
-    {
-        this.retryTimeout = retryTimeout;
-        return this;
-    }
-
-    public OfficeManager buildOfficeManager() throws IllegalStateException
-    {
-        if (this.officeHome == null) {
-            throw new IllegalStateException("officeHome not set and could not be auto-detected");
-        } else if (!this.officeHome.isDirectory()) {
-            throw new IllegalStateException("officeHome doesn't exist or is not a directory: " + this.officeHome);
-        } else if (!OfficeUtils.getOfficeExecutable(this.officeHome).isFile()) {
-            throw new IllegalStateException("invalid officeHome: it doesn't contain soffice.bin: " + this.officeHome);
-        }
-        if (this.templateProfileDir != null && !isValidProfileDir(this.templateProfileDir)) {
-            throw new IllegalStateException("templateProfileDir doesn't appear to contain a user profile: "
-                + this.templateProfileDir);
-        }
-        if (!this.workDir.isDirectory()) {
-            throw new IllegalStateException("workDir doesn't exist or is not a directory: " + this.workDir);
-        }
-
-        if (this.processManager == null) {
-            this.processManager = findBestProcessManager();
-        }
-
-        int numInstances =
-            this.connectionProtocol == OfficeConnectionProtocol.PIPE ? this.pipeNames.length : this.portNumbers.length;
-        UnoUrl[] unoUrls = new UnoUrl[numInstances];
-        for (int i = 0; i < numInstances; i++) {
-            unoUrls[i] =
-                (this.connectionProtocol == OfficeConnectionProtocol.PIPE) ? UnoUrl.pipe(this.pipeNames[i]) : UnoUrl
-                    .socket(this.portNumbers[i]);
-        }
-        return new ProcessPoolOfficeManager(this.officeHome, unoUrls, this.runAsArgs, this.templateProfileDir,
-            this.workDir, this.retryTimeout, this.taskQueueTimeout, this.taskExecutionTimeout, this.maxTasksPerProcess,
-            this.processManager);
-    }
-
-    private ProcessManager findBestProcessManager()
-    {
-        if (isSigarAvailable()) {
-            return new SigarProcessManager();
-        } else if (PlatformUtils.isLinux()) {
-            LinuxProcessManager processManager = new LinuxProcessManager();
-            if (this.runAsArgs != null) {
-                processManager.setRunAsArgs(this.runAsArgs);
-            }
-            return processManager;
-        } else {
-            // NOTE: UnixProcessManager can't be trusted to work on Solaris
-            // because of the 80-char limit on ps output there
-            return new PureJavaProcessManager();
-        }
-    }
-
-    private boolean isSigarAvailable()
-    {
-        try {
-            Class.forName("org.hyperic.sigar.Sigar", false, getClass().getClassLoader());
-            return true;
-        } catch (ClassNotFoundException classNotFoundException) {
-            return false;
-        }
-    }
-
-    private void checkArgumentNotNull(String argName, Object argValue) throws NullPointerException
-    {
-        if (argValue == null) {
-            throw new NullPointerException(argName + " must not be null");
-        }
-    }
-
-    private void checkArgument(String argName, boolean condition, String message) throws IllegalArgumentException
-    {
-        if (!condition) {
-            throw new IllegalArgumentException(argName + " " + message);
-        }
-    }
-
-    private boolean isValidProfileDir(File profileDir)
-    {
-        return new File(profileDir, "user").isDirectory();
-    }
 }

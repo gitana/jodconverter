@@ -12,35 +12,32 @@
 //
 package org.artofsolving.jodconverter.office;
 
+
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 /**
  * A {@link ThreadFactory} that allows for custom thread names
  */
-class NamedThreadFactory implements ThreadFactory
-{
-    private static final AtomicInteger threadIndex = new AtomicInteger(0);
+class NamedThreadFactory implements ThreadFactory {
+  private static final AtomicInteger threadIndex = new AtomicInteger(0);
+  private final String               baseName;
+  private final boolean              daemon;
 
-    private final String baseName;
+  
+  public NamedThreadFactory(String baseName) {
+    this(baseName, true);
+  }
 
-    private final boolean daemon;
+  public NamedThreadFactory(String baseName, boolean daemon) {
+    this.baseName = baseName;
+    this.daemon = daemon;
+  }
 
-    public NamedThreadFactory(String baseName)
-    {
-        this(baseName, true);
-    }
-
-    public NamedThreadFactory(String baseName, boolean daemon)
-    {
-        this.baseName = baseName;
-        this.daemon = daemon;
-    }
-
-    public Thread newThread(Runnable runnable)
-    {
-        Thread thread = new Thread(runnable, this.baseName + "-" + threadIndex.getAndIncrement());
-        thread.setDaemon(this.daemon);
-        return thread;
-    }
+  public Thread newThread(Runnable runnable) {
+    Thread thread = new Thread(runnable, this.baseName + "-" + threadIndex.getAndIncrement());
+    thread.setDaemon(this.daemon);
+    return thread;
+  }
 }
