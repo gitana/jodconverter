@@ -16,7 +16,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+//import java.util.logging.Logger;
 
 
 class PooledOfficeManager implements OfficeManager {
@@ -26,7 +29,8 @@ class PooledOfficeManager implements OfficeManager {
   private volatile boolean                    stopping                = false;
   private int                                 taskCount;
   private Future<?>                           currentTask;
-  private final Logger                        logger                  = Logger.getLogger(getClass().getName());
+//  private final Logger                        logger                  = Logger.getLogger(getClass().getName());
+  private static final Logger                 LOG                     = LoggerFactory.getLogger(PooledOfficeManager.class);
   private OfficeConnectionEventListener       connectionEventListener = initConnectionEventListener();
 
 
@@ -46,8 +50,9 @@ class PooledOfficeManager implements OfficeManager {
       public void run() {
         if (PooledOfficeManager.this.settings.getMaxTasksPerProcess() > 0
             && ++PooledOfficeManager.this.taskCount == PooledOfficeManager.this.settings.getMaxTasksPerProcess() + 1) {
-          PooledOfficeManager.this.logger.info(String.format("reached limit of %d maxTasksPerProcess: restarting",
-              PooledOfficeManager.this.settings.getMaxTasksPerProcess()));
+//          PooledOfficeManager.this.logger.info(String.format("reached limit of %d maxTasksPerProcess: restarting",
+//              PooledOfficeManager.this.settings.getMaxTasksPerProcess()));
+          LOG.info("reached limit of {} maxTasksPerProcess: restarting", PooledOfficeManager.this.settings.getMaxTasksPerProcess());
           PooledOfficeManager.this.taskExecutor.setAvailable(false);
           PooledOfficeManager.this.stopping = true;
           PooledOfficeManager.this.managedOfficeProcess.restartAndWait();
@@ -103,7 +108,8 @@ class PooledOfficeManager implements OfficeManager {
           // expected
           PooledOfficeManager.this.stopping = false;
         } else {
-          PooledOfficeManager.this.logger.warning("connection lost unexpectedly; attempting restart");
+//          PooledOfficeManager.this.logger.warning("connection lost unexpectedly; attempting restart");
+          LOG.warn("connection lost unexpectedly; attempting restart");
           if (PooledOfficeManager.this.currentTask != null) {
             PooledOfficeManager.this.currentTask.cancel(true);
           }

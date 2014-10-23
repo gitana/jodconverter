@@ -17,7 +17,12 @@ import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
+
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.bridge.XBridge;
@@ -42,7 +47,8 @@ class OfficeConnection implements OfficeContext {
   private XMultiComponentFactory                    serviceManager;
   private XComponentContext                         componentContext;
   private XEventListener                            bridgeListener           = initXEventListener();
-  private final Logger                              logger                   = Logger.getLogger(getClass().getName());
+//  private final Logger                              logger                   = Logger.getLogger(getClass().getName());
+  private static final Logger                       LOG                      = LoggerFactory.getLogger(OfficeConnection.class);
 
   
   public OfficeConnection(UnoUrl unoUrl) {
@@ -54,7 +60,8 @@ class OfficeConnection implements OfficeContext {
   }
 
   public void connect() throws ConnectException {
-    this.logger.fine(String.format("connecting with connectString '%s'", this.unoUrl));
+//    this.logger.fine(String.format("connecting with connectString '%s'", this.unoUrl));
+    LOG.debug("connecting with connectString '{}'", this.unoUrl);
     try {
       XComponentContext localContext = Bootstrap.createInitialComponentContext(null);
       XMultiComponentFactory localServiceManager = localContext.getServiceManager();
@@ -75,7 +82,8 @@ class OfficeConnection implements OfficeContext {
       XPropertySet properties = OfficeUtils.cast(XPropertySet.class, this.serviceManager);
       this.componentContext = OfficeUtils.cast(XComponentContext.class, properties.getPropertyValue("DefaultContext"));
       this.connected = true;
-      this.logger.info(String.format("connected: '%s'", this.unoUrl));
+//      this.logger.info(String.format("connected: '%s'", this.unoUrl));
+      LOG.info("connected: '{}'", this.unoUrl);
       OfficeConnectionEvent connectionEvent = new OfficeConnectionEvent(this);
       for (OfficeConnectionEventListener listener : this.connectionEventListeners) {
         listener.connected(connectionEvent);
@@ -92,7 +100,8 @@ class OfficeConnection implements OfficeContext {
   }
 
   public synchronized void disconnect() {
-    this.logger.fine(String.format("disconnecting: '%s'", this.unoUrl));
+//    this.logger.fine(String.format("disconnecting: '%s'", this.unoUrl));
+    LOG.debug("disconnecting: '{}'", this.unoUrl);
     this.bridgeComponent.dispose();
   }
 
@@ -111,7 +120,8 @@ class OfficeConnection implements OfficeContext {
       public void disposing(EventObject event) {
         if (OfficeConnection.this.connected) {
           OfficeConnection.this.connected = false;
-          OfficeConnection.this.logger.info(String.format("disconnected: '%s'", OfficeConnection.this.unoUrl));
+//          OfficeConnection.this.logger.info(String.format("disconnected: '%s'", OfficeConnection.this.unoUrl));
+          LOG.info("disconnected: '{}'", OfficeConnection.this.unoUrl);
           OfficeConnectionEvent connectionEvent = new OfficeConnectionEvent(OfficeConnection.this);
           for (OfficeConnectionEventListener listener : OfficeConnection.this.connectionEventListeners) {
             listener.disconnected(connectionEvent);

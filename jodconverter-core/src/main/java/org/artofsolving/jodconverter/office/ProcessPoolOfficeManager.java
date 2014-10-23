@@ -17,9 +17,13 @@ import java.io.File;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
+
+
 
 import org.artofsolving.jodconverter.process.ProcessManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 class ProcessPoolOfficeManager implements OfficeManager {
@@ -27,7 +31,8 @@ class ProcessPoolOfficeManager implements OfficeManager {
   private final PooledOfficeManager[]              pooledManagers;
   private final long                               taskQueueTimeout;
   private volatile boolean                         running = false;
-  private final Logger                             logger  = Logger.getLogger(ProcessPoolOfficeManager.class.getName());
+//  private final Logger                             logger  = Logger.getLogger(ProcessPoolOfficeManager.class.getName());
+  private static final Logger                      LOG = LoggerFactory.getLogger(ProcessPoolOfficeManager.class);
 
 
   public ProcessPoolOfficeManager(File officeHome, UnoUrl[] unoUrls, String[] runAsArgs, File templateProfileDir,
@@ -48,7 +53,8 @@ class ProcessPoolOfficeManager implements OfficeManager {
       settings.setProcessManager(processManager);
       this.pooledManagers[i] = new PooledOfficeManager(settings);
     }
-    this.logger.info("ProcessManager implementation is " + processManager.getClass().getSimpleName());
+//    this.logger.info("ProcessManager implementation is " + processManager.getClass().getSimpleName());
+    LOG.info("ProcessManager implementation is {}", processManager.getClass().getSimpleName());
   }
 
   @Override
@@ -82,12 +88,14 @@ class ProcessPoolOfficeManager implements OfficeManager {
   @Override
   public synchronized void stop() throws OfficeException {
     this.running = false;
-    this.logger.info("stopping");
+//    this.logger.info("stopping");
+    LOG.info("stopping");
     this.pool.clear();
     for (int i = 0; i < this.pooledManagers.length; i++) {
       this.pooledManagers[i].stop();
     }
-    this.logger.info("stopped");
+//    this.logger.info("stopped");
+    LOG.info("stopped");
   }
 
   private PooledOfficeManager acquireManager() {

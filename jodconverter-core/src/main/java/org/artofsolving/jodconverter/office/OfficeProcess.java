@@ -22,12 +22,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.artofsolving.jodconverter.process.ProcessManager;
 import org.artofsolving.jodconverter.process.ProcessQuery;
 import org.artofsolving.jodconverter.util.PlatformUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 class OfficeProcess {
@@ -39,7 +41,8 @@ class OfficeProcess {
   private final ProcessManager processManager;
   private Process              process;
   private long                 pid    = PID_UNKNOWN;
-  private final Logger         logger = Logger.getLogger(getClass().getName());
+//  private final Logger         logger = Logger.getLogger(getClass().getName());
+  private static final Logger  LOG = LoggerFactory.getLogger(OfficeProcess.class);
 
 
   public OfficeProcess(File officeHome, UnoUrl unoUrl, String[] runAsArgs, File templateProfileDir, File workDir,
@@ -85,7 +88,8 @@ class OfficeProcess {
     if (PlatformUtils.isWindows()) {
       addBasisAndUrePaths(processBuilder);
     }
-    this.logger.info(String.format("starting process with acceptString '%s' and profileDir '%s'", this.unoUrl, this.instanceProfileDir));
+//    this.logger.info(String.format("starting process with acceptString '%s' and profileDir '%s'", this.unoUrl, this.instanceProfileDir));
+    LOG.info("starting process with acceptString '{}' and profileDir '{}'", this.unoUrl, this.instanceProfileDir);
     this.process = processBuilder.start();
 
     synchronized (this) {
@@ -99,7 +103,8 @@ class OfficeProcess {
     if (this.pid == PID_NOT_FOUND) {
       throw new IllegalStateException(String.format("process with acceptString '%s' started but its pid could not be found", this.unoUrl.getAcceptString()));
     }
-    this.logger.info("started process" + (this.pid != PID_UNKNOWN ? "; pid = " + this.pid : ""));
+//    this.logger.info("started process" + (this.pid != PID_UNKNOWN ? "; pid = " + this.pid : ""));
+    LOG.info("started process; pid = {}", (this.pid != PID_UNKNOWN ? this.pid : "PID_UNKNOWN"));
   }
 
   private File getInstanceProfileDir(File workDir, UnoUrl unoUrl) {
@@ -109,7 +114,8 @@ class OfficeProcess {
 
   private void prepareInstanceProfileDir() throws OfficeException {
     if (this.instanceProfileDir.exists()) {
-      this.logger.warning(String.format("profile dir '%s' already exists; deleting", this.instanceProfileDir));
+//      this.logger.warning(String.format("profile dir '%s' already exists; deleting", this.instanceProfileDir));
+      LOG.warn("profile dir '{}' already exists; deleting", this.instanceProfileDir);
       deleteProfileDir();
     }
     if (this.templateProfileDir != null) {
@@ -128,9 +134,11 @@ class OfficeProcess {
       } catch (IOException ioException) {
         File oldProfileDir = new File(this.instanceProfileDir.getParentFile(), this.instanceProfileDir.getName() + ".old." + System.currentTimeMillis());
         if (this.instanceProfileDir.renameTo(oldProfileDir)) {
-          this.logger.warning("could not delete profileDir: " + ioException.getMessage() + "; renamed it to " + oldProfileDir);
+//          this.logger.warning("could not delete profileDir: " + ioException.getMessage() + "; renamed it to " + oldProfileDir);
+          LOG.warn("could not delete profileDir: {}; renamed it to '{}'", ioException.getMessage(), oldProfileDir);
         } else {
-          this.logger.severe("could not delete profileDir: " + ioException.getMessage());
+//          this.logger.severe("could not delete profileDir: " + ioException.getMessage());
+          LOG.error("could not delete profileDir: {}", ioException.getMessage());
         }
       }
     }
@@ -141,7 +149,8 @@ class OfficeProcess {
     // http://wiki.services.openoffice.org/wiki/ODF_Toolkit/Efforts/Three-Layer_OOo
     File basisLink = new File(this.officeHome, "basis-link");
     if (!basisLink.isFile()) {
-      this.logger.fine("no %OFFICE_HOME%/basis-link found; assuming it's OOo 2.x and we don't need to append URE and Basic paths");
+//      this.logger.fine("no %OFFICE_HOME%/basis-link found; assuming it's OOo 2.x and we don't need to append URE and Basic paths");
+      LOG.debug("no %OFFICE_HOME%/basis-link found; assuming OOo 2.x and we don't need to append URE and Basic paths");
       return;
     }
     String basisLinkText = FileUtils.readFileToString(basisLink).trim();
@@ -162,7 +171,8 @@ class OfficeProcess {
       }
     }
     String path = environment.get(pathKey) + ";" + ureBin.getAbsolutePath() + ";" + basisProgram.getAbsolutePath();
-    this.logger.fine(String.format("setting %s to \"%s\"", pathKey, path));
+//    this.logger.fine(String.format("setting %s to \"%s\"", pathKey, path));
+    LOG.debug("setting {} to '{}'", pathKey, path);
     environment.put(pathKey, path);
   }
 
@@ -213,13 +223,15 @@ class OfficeProcess {
   }
 
   public int forciblyTerminate(long retryInterval, long retryTimeout) throws IOException, RetryTimeoutException {
-    this.logger.info("trying to forcibly terminate process: '" + this.unoUrl + "'" + (this.pid != PID_UNKNOWN ? " (pid " + this.pid + ")" : ""));
+//    this.logger.info("trying to forcibly terminate process: '" + this.unoUrl + "'" + (this.pid != PID_UNKNOWN ? " (pid " + this.pid + ")" : ""));
+    LOG.info("trying to forcibly terminate process: '{}' (pid: {})", this.unoUrl, (this.pid != PID_UNKNOWN ? this.pid : "PID_UNKNOWN"));
     if (this.pid == PID_UNKNOWN) {
       long foundPid = this.processManager.findPid(new ProcessQuery("soffice.*", this.unoUrl.getAcceptString()));
       try {
         this.processManager.kill(this.process, foundPid);
       } catch (IllegalArgumentException ex) {
-        this.logger.severe("Failed to forcibly terminate process: " + ex.getMessage());
+//        this.logger.severe("Failed to forcibly terminate process: " + ex.getMessage());
+        LOG.error("Failed to forcibly terminate process: {}", ex.getMessage());
       }
     } else {
       this.processManager.kill(this.process, this.pid);
