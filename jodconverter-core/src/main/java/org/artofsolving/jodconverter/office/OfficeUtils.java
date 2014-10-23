@@ -65,6 +65,10 @@ public class OfficeUtils {
     if (System.getProperty("office.home") != null) {
       return new File(System.getProperty("office.home"));
     }
+    String envVar = System.getenv("OFFICE_HOME"); 
+    if (envVar != null) {
+      return new File(envVar);
+    }
     if (PlatformUtils.isWindows()) {
       // %ProgramFiles(x86)% on 64-bit machines; %ProgramFiles% on 32-bit ones
       String programFiles = System.getenv("ProgramFiles(x86)");
