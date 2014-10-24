@@ -39,11 +39,7 @@ public class ProcessManagerTest
         assertEquals(pid, javaPid.longValue());
 
         processManager.kill(process, pid);
-        synchronized (this) {
-          try {
-            wait(2000);
-          } catch (InterruptedException e) { ; }
-        }
+
         assertEquals(processManager.findPid(query), ProcessManager.PID_NOT_FOUND);
     }
 
@@ -59,11 +55,6 @@ public class ProcessManagerTest
           process = new ProcessBuilder("sleep", "10s").start();
           query = new ProcessQuery("sleep", "10s");          
         }
-        synchronized (this) {
-          try {
-            wait(4000);
-          } catch (InterruptedException e) { ; }
-        }
 
         long pid = processManager.findPid(query);
         assertFalse(pid == ProcessManager.PID_NOT_FOUND);
@@ -73,11 +64,7 @@ public class ProcessManagerTest
         }
 
         processManager.kill(process, pid);
-        synchronized (this) {
-          try {
-            wait(2000);
-          } catch (InterruptedException e) { ; }
-        }
+
         assertEquals(processManager.findPid(query), ProcessManager.PID_NOT_FOUND);
     }
 }
