@@ -25,13 +25,18 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+
 import org.artofsolving.jodconverter.OfficeDocumentConverter;
 import org.artofsolving.jodconverter.document.DefaultDocumentFormatRegistry;
 import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
 import org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry;
 import org.artofsolving.jodconverter.office.DefaultOfficeManagerConfiguration;
 import org.artofsolving.jodconverter.office.OfficeManager;
+
 import org.json.JSONException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -48,6 +53,9 @@ public class Convert {
   private static final Option  OPTION_USER_PROFILE       = new Option("u", "user-profile", true, "use settings from the given user installation dir (optional)");
   private static final Options OPTIONS                   = initOptions();
   private static final int     DEFAULT_OFFICE_PORT       = 2002;
+
+  private static final Logger  LOG                       = LoggerFactory.getLogger(Convert.class);
+
 
   private static Options initOptions() {
     Options options = new Options();
@@ -114,7 +122,9 @@ public class Convert {
           File inputFile = new File(fileNames[i]);
           String outputName = FilenameUtils.getBaseName(fileNames[i]) + "." + outputFormat;
           File outputFile = new File(FilenameUtils.getFullPath(fileNames[i]) + outputName);
+          LOG.debug("submitting '{}' for conversion", fileNames[i]);
           converter.convert(inputFile, outputFile);
+          LOG.debug("conversion completed: {} -> {}", fileNames[i], outputName);
         }
       }
     } finally {
