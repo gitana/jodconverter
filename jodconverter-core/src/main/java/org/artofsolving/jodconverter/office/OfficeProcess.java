@@ -21,18 +21,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+//import java.util.Map;
 //import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.artofsolving.jodconverter.process.ProcessManager;
 import org.artofsolving.jodconverter.process.ProcessQuery;
-import org.artofsolving.jodconverter.util.PlatformUtils;
+//import org.artofsolving.jodconverter.util.PlatformUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 class OfficeProcess {
+  private static final long    FIND_PID_TIMEOUT = 5000;
   private final File           officeHome;
   private final UnoUrl         unoUrl;
   private final String[]       runAsArgs;
@@ -85,25 +86,33 @@ class OfficeProcess {
     command.add("-nologo");
     command.add("-norestore");
     ProcessBuilder processBuilder = new ProcessBuilder(command);
-    if (PlatformUtils.isWindows()) {
-      addBasisAndUrePaths(processBuilder);
-    }
+    // Basis-link was removed in LibreOffice 3.5
+//    if (PlatformUtils.isWindows()) {
+//      addBasisAndUrePaths(processBuilder);
+//    }
 //    this.logger.info(String.format("starting process with acceptString '%s' and profileDir '%s'", this.unoUrl, this.instanceProfileDir));
     LOG.info("starting process with acceptString '{}' and profileDir '{}'", this.unoUrl, this.instanceProfileDir);
+
+    long startTime = System.currentTimeMillis();
     this.process = processBuilder.start();
 
-    synchronized (this) {
-      try {
-        this.wait(5000);
-      } catch (InterruptedException e) {
+    do {
+      synchronized (this) {
+        try {
+          this.wait(500);
+        } catch (InterruptedException e) {  }
       }
-    }
 
-    this.pid = this.processManager.findPid(processQuery);
+      this.pid = this.processManager.findPid(processQuery);
+
+    } while ((this.pid == PID_UNKNOWN || this.pid == PID_NOT_FOUND) 
+        && (System.currentTimeMillis() - startTime < FIND_PID_TIMEOUT));
+    
     if (this.pid == PID_NOT_FOUND) {
       throw new IllegalStateException(String.format("process with acceptString '%s' started but its pid could not be found", this.unoUrl.getAcceptString()));
     }
-//    this.logger.info("started process" + (this.pid != PID_UNKNOWN ? "; pid = " + this.pid : ""));
+
+      //    this.logger.info("started process" + (this.pid != PID_UNKNOWN ? "; pid = " + this.pid : ""));
     LOG.info("started process; pid = {}", (this.pid != PID_UNKNOWN ? this.pid : "PID_UNKNOWN"));
   }
 
@@ -144,6 +153,7 @@ class OfficeProcess {
     }
   }
 
+/*
   private void addBasisAndUrePaths(ProcessBuilder processBuilder) throws IOException {
     // see
     // http://wiki.services.openoffice.org/wiki/ODF_Toolkit/Efforts/Three-Layer_OOo
@@ -175,6 +185,7 @@ class OfficeProcess {
     LOG.debug("setting {} to '{}'", pathKey, path);
     environment.put(pathKey, path);
   }
+*/
 
   public boolean isRunning() {
     if (this.process == null) {
