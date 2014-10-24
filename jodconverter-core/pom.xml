@@ -132,14 +132,14 @@
       <!-- for more robust process management -->
       <groupId>org.hyperic</groupId>
       <artifactId>sigar</artifactId>
-      <version>1.6.5.132</version>
+      <version>1.6.5.132-6</version>
       <optional>true</optional>
     </dependency>
     <dependency>
       <!-- for more robust process management -->
       <groupId>org.hyperic</groupId>
       <artifactId>sigar-dist</artifactId>
-      <version>1.6.5.132</version>
+      <version>1.6.5.132-6</version>
       <type>zip</type>
     </dependency>
     <dependency>
@@ -183,7 +183,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.17</version>
         <configuration>
-          <!-- don't run tests in parallel -->
+          <skipTests>true</skipTests>
           <perCoreThreadCount>false</perCoreThreadCount>
           <threadCount>1</threadCount>
         </configuration>
