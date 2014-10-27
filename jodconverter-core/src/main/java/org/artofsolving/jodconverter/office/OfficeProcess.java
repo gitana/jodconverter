@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 
 class OfficeProcess {
+  private static final long    FIND_PID_RETRY   = 500;
   private static final long    FIND_PID_TIMEOUT = 5000;
   private final File           officeHome;
   private final UnoUrl         unoUrl;
@@ -99,7 +100,7 @@ class OfficeProcess {
     do {
       synchronized (this) {
         try {
-          this.wait(500);
+          this.wait(FIND_PID_RETRY);
         } catch (InterruptedException e) {  }
       }
 
