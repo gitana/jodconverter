@@ -13,21 +13,22 @@
 package org.artofsolving.jodconverter.office;
 
 
-abstract class Retryable {
+abstract class Retryable <T extends Throwable> {
   /**
    * @throws TemporaryException
-   *           for an error condition that can be temporary - i.e. retrying
-   *           later could be successful
-   * @throws Exception
+   *           for an error condition that can be temporary - i.e. retrying later could be successful
+   * @throws RetryTimeoutException
+   *           if this Retryable fails to complete its task in the given time
+   * @throws T extends Throwable
    *           for all other error conditions
    */
-  protected abstract void attempt() throws TemporaryException, Exception;
+  protected abstract void attempt() throws TemporaryException, RetryTimeoutException, T;
 
-  public void execute(long interval, long timeout) throws RetryTimeoutException, Exception {
+  public void execute(long interval, long timeout) throws RetryTimeoutException, T {
     execute(0L, interval, timeout);
   }
 
-  public void execute(long delay, long interval, long timeout) throws RetryTimeoutException, Exception {
+  public void execute(long delay, long interval, long timeout) throws RetryTimeoutException, T {
     long start = System.currentTimeMillis();
     if (delay > 0L) {
       sleep(delay);

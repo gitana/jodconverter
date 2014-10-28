@@ -24,11 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-
 import org.artofsolving.jodconverter.process.ProcessManager;
 import org.artofsolving.jodconverter.process.ProcessQuery;
 import org.artofsolving.jodconverter.util.PlatformUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +60,7 @@ class OfficeProcess {
   }
 
   public void start(boolean restart) throws IOException {
-    ProcessQuery processQuery = new ProcessQuery("soffice.bin", this.unoUrl.getAcceptString());
+    final ProcessQuery processQuery = new ProcessQuery("soffice.bin", this.unoUrl.getAcceptString());
     long foundPid = this.processManager.findPid(processQuery);
     if (!(foundPid == PID_NOT_FOUND || foundPid == PID_UNKNOWN)) {
       throw new IllegalStateException(String.format("a process with acceptString '%s' is already running; pid %d",
@@ -93,20 +91,23 @@ class OfficeProcess {
     }
     LOG.info("starting process with acceptString '{}' and profileDir '{}'", this.unoUrl, this.instanceProfileDir);
 
-    long startTime = System.currentTimeMillis();
     this.process = processBuilder.start();
 
-    do {
-      synchronized (this) {
-        try {
-          this.wait(FIND_PID_RETRY);
-        } catch (InterruptedException e) {  }
-      }
-
-      this.pid = this.processManager.findPid(processQuery);
-
-    } while ((this.pid == PID_UNKNOWN || this.pid == PID_NOT_FOUND) 
-        && (System.currentTimeMillis() - startTime < FIND_PID_TIMEOUT));
+    try {
+      new Retryable<IOException>() {
+        @Override
+        protected void attempt() throws TemporaryException, IOException {
+          long tryPid = OfficeProcess.this.processManager.findPid(processQuery);
+          if (tryPid == PID_UNKNOWN || tryPid == PID_NOT_FOUND) {
+            throw new TemporaryException(new Throwable("Not found"));
+          } else {
+            OfficeProcess.this.pid = tryPid;
+          }
+        }
+      }.execute(FIND_PID_RETRY, FIND_PID_TIMEOUT);
+    } catch (RetryTimeoutException ex) {
+      this.pid = PID_NOT_FOUND;
+    }
     
     if (this.pid == PID_NOT_FOUND) {
       throw new IllegalStateException(String.format("process with acceptString '%s' started but its pid could not be found", this.unoUrl.getAcceptString()));
@@ -197,7 +198,7 @@ class OfficeProcess {
     return getExitCode() == null;
   }
 
-  private class ExitCodeRetryable extends Retryable {
+  private class ExitCodeRetryable extends Retryable<Exception> {
 
     private int exitCode;
 

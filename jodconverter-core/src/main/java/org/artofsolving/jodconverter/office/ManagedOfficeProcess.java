@@ -17,9 +17,6 @@ import java.net.ConnectException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
-
 
 
 import org.slf4j.Logger;
@@ -35,7 +32,6 @@ class ManagedOfficeProcess {
   private final OfficeProcess                process;
   private final OfficeConnection             connection;
   private ExecutorService                    executor = Executors.newSingleThreadExecutor(new NamedThreadFactory("OfficeProcessThread"));
-//  private final Logger                       logger   = Logger.getLogger(getClass().getName());
   private static final Logger                LOG = LoggerFactory.getLogger(ManagedOfficeProcess.class);
 
   public ManagedOfficeProcess(ManagedOfficeProcessSettings settings) throws OfficeException {
@@ -110,7 +106,6 @@ class ManagedOfficeProcess {
           doEnsureProcessExited();
           doStartProcessAndConnect();
         } catch (OfficeException officeException) {
-//          ManagedOfficeProcess.this.logger.log(Level.SEVERE, "could not restart process", officeException);
           LOG.error("could not restart process", officeException);
         }
       }
@@ -120,7 +115,7 @@ class ManagedOfficeProcess {
   private void doStartProcessAndConnect() throws OfficeException {
     try {
       this.process.start();
-      new Retryable() {
+      new Retryable<Exception>() {
         @Override
         protected void attempt() throws TemporaryException, Exception {
           try {
@@ -133,7 +128,6 @@ class ManagedOfficeProcess {
             } else if (exitCode.equals(EXIT_CODE_NEW_INSTALLATION)) {
               // restart and retry later
               // see http://code.google.com/p/jodconverter/issues/detail?id=84
-//              ManagedOfficeProcess.this.logger.log(Level.WARNING, "office process died with exit code 81; restarting it");
               LOG.warn("office process died with exit code 81; restarting it");
               ManagedOfficeProcess.this.process.start(true);
               throw new TemporaryException(connectException);
@@ -164,7 +158,6 @@ class ManagedOfficeProcess {
   private void doEnsureProcessExited() throws OfficeException {
     try {
       int exitCode = this.process.getExitCode(this.settings.getRetryInterval(), this.settings.getRetryTimeout());
-//      this.logger.info("process exited with code " + exitCode);
       LOG.info("process exited with code {}", exitCode);
     } catch (RetryTimeoutException retryTimeoutException) {
       doTerminateProcess();
@@ -175,7 +168,6 @@ class ManagedOfficeProcess {
   private void doTerminateProcess() throws OfficeException {
     try {
       int exitCode = this.process.forciblyTerminate(this.settings.getRetryInterval(), this.settings.getRetryTimeout());
-//      this.logger.info("process forcibly terminated with code " + exitCode);
       LOG.info("process forcibly terminated with code {}", exitCode);
     } catch (Exception exception) {
       throw new OfficeException("could not terminate process", exception);
