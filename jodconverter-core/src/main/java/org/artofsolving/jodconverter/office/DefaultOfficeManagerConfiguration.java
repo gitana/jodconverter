@@ -24,19 +24,21 @@ import org.artofsolving.jodconverter.util.PlatformUtils;
 
 
 public class DefaultOfficeManagerConfiguration {
-  public static final long         DEFAULT_RETRY_TIMEOUT = 120000L;
-  private File                     officeHome            = OfficeUtils.getDefaultOfficeHome();
-  private OfficeConnectionProtocol connectionProtocol    = OfficeConnectionProtocol.SOCKET;
-  private int[]                    portNumbers           = new int[] { 2002 };
-  private String[]                 pipeNames             = new String[] { "office" };
-  private String[]                 runAsArgs             = null;
-  private File                     templateProfileDir    = null;
-  private File                     workDir               = new File(System.getProperty("java.io.tmpdir"));
-  private long                     taskQueueTimeout      = 30000L;                                        // 30 seconds
-  private long                     taskExecutionTimeout  = 120000L;                                       // 2 minutes
-  private int                      maxTasksPerProcess    = 200;
-  private long                     retryTimeout          = DEFAULT_RETRY_TIMEOUT;
-  private ProcessManager           processManager        = null;                                          // lazily initialised
+  public static final long         DEFAULT_RETRY_TIMEOUT  = 120000L;
+  public static final long         DEFAULT_RETRY_INTERVAL = 250L;
+  private File                     officeHome             = OfficeUtils.getDefaultOfficeHome();
+  private OfficeConnectionProtocol connectionProtocol     = OfficeConnectionProtocol.SOCKET;
+  private int[]                    portNumbers            = new int[] { 2002 };
+  private String[]                 pipeNames              = new String[] { "office" };
+  private String[]                 runAsArgs              = null;
+  private File                     templateProfileDir     = null;
+  private File                     workDir                = new File(System.getProperty("java.io.tmpdir"));
+  private long                     taskQueueTimeout       = 30000L;                                        // 30 seconds
+  private long                     taskExecutionTimeout   = 120000L;                                       // 2 minutes
+  private int                      maxTasksPerProcess     = 200;
+  private long                     retryTimeout           = DEFAULT_RETRY_TIMEOUT;
+  private long                     retryInterval          = DEFAULT_RETRY_INTERVAL;
+  private ProcessManager           processManager         = null;                                          // lazily initialised
 
 
   public DefaultOfficeManagerConfiguration setOfficeHome(String officeHome) throws NullPointerException, IllegalArgumentException {
@@ -155,6 +157,19 @@ public class DefaultOfficeManagerConfiguration {
     return this;
   }
 
+  /**
+   * Retry interval set in milliseconds. Used for retrying office process calls.
+   * If not set, it defaults to 250 milliseconds
+   * 
+   * @param retryTimeout
+   *          in milliseconds
+   * @return
+   */
+  public DefaultOfficeManagerConfiguration setRetryInterval(long retryInterval) {
+    this.retryInterval = retryInterval;
+    return this;
+  }
+
   public OfficeManager buildOfficeManager() throws IllegalStateException {
     if (this.officeHome == null) {
       throw new IllegalStateException("officeHome not set and could not be auto-detected");
@@ -180,8 +195,9 @@ public class DefaultOfficeManagerConfiguration {
       unoUrls[i] = (this.connectionProtocol == OfficeConnectionProtocol.PIPE) ? UnoUrl.pipe(this.pipeNames[i]) : UnoUrl.socket(this.portNumbers[i]);
     }
     return new ProcessPoolOfficeManager(
-        this.officeHome, unoUrls, this.runAsArgs, this.templateProfileDir, this.workDir, this.retryTimeout,
-        this.taskQueueTimeout, this.taskExecutionTimeout, this.maxTasksPerProcess, this.processManager);
+        this.officeHome, unoUrls, this.runAsArgs, this.templateProfileDir, this.workDir,
+        this.retryTimeout, this.retryInterval, this.taskQueueTimeout, this.taskExecutionTimeout, this.maxTasksPerProcess,
+        this.processManager);
   }
 
   private ProcessManager findBestProcessManager() {

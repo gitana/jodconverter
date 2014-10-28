@@ -20,7 +20,6 @@ import org.artofsolving.jodconverter.process.PureJavaProcessManager;
 
 
 class ManagedOfficeProcessSettings {
-  public static final long DEFAULT_RETRY_INTERVAL = 250L;
   private final UnoUrl     unoUrl;
   private File             officeHome             = OfficeUtils.getDefaultOfficeHome();
   private String[]         runAsArgs;
@@ -28,7 +27,7 @@ class ManagedOfficeProcessSettings {
   private File             workDir                = new File(System.getProperty("java.io.tmpdir"));
   private ProcessManager   processManager         = new PureJavaProcessManager();
   private long             retryTimeout           = DefaultOfficeManagerConfiguration.DEFAULT_RETRY_TIMEOUT;
-  private long             retryInterval          = DEFAULT_RETRY_INTERVAL;
+  private long             retryInterval          = DefaultOfficeManagerConfiguration.DEFAULT_RETRY_INTERVAL;
 
 
   public ManagedOfficeProcessSettings(UnoUrl unoUrl) {

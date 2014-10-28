@@ -36,8 +36,8 @@ class ProcessPoolOfficeManager implements OfficeManager {
 
 
   public ProcessPoolOfficeManager(File officeHome, UnoUrl[] unoUrls, String[] runAsArgs, File templateProfileDir,
-      File workDir, long retryTimeout, long taskQueueTimeout, long taskExecutionTimeout, int maxTasksPerProcess,
-      ProcessManager processManager) {
+      File workDir, long retryTimeout, long retryInterval, long taskQueueTimeout, long taskExecutionTimeout,
+      int maxTasksPerProcess, ProcessManager processManager) {
     this.taskQueueTimeout = taskQueueTimeout;
     this.pool = new ArrayBlockingQueue<PooledOfficeManager>(unoUrls.length);
     this.pooledManagers = new PooledOfficeManager[unoUrls.length];
@@ -48,6 +48,7 @@ class ProcessPoolOfficeManager implements OfficeManager {
       settings.setWorkDir(workDir);
       settings.setOfficeHome(officeHome);
       settings.setRetryTimeout(retryTimeout);
+      settings.setRetryInterval(retryInterval);
       settings.setTaskExecutionTimeout(taskExecutionTimeout);
       settings.setMaxTasksPerProcess(maxTasksPerProcess);
       settings.setProcessManager(processManager);
