@@ -22,9 +22,9 @@ import java.util.Set;
 
 
 public class SimpleDocumentFormatRegistry implements DocumentFormatRegistry {
-  private List<DocumentFormat> documentFormats = new ArrayList<>();
-  private Map<String,DocumentFormat>  extensions      = new HashMap<>();
-  private Map<String,DocumentFormat>  mediaTypes      = new HashMap<>();
+  private List<DocumentFormat> documentFormats   = new ArrayList<DocumentFormat>();
+  private Map<String,DocumentFormat>  extensions = new HashMap<String,DocumentFormat>();
+  private Map<String,DocumentFormat>  mediaTypes = new HashMap<String,DocumentFormat>();
 
 
   public void addFormat(DocumentFormat documentFormat) {
