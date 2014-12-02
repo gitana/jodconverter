@@ -14,7 +14,6 @@ package org.artofsolving.jodconverter.office;
 
 
 import java.io.File;
-import java.util.Objects;
 
 import org.artofsolving.jodconverter.process.LinuxProcessManager;
 import org.artofsolving.jodconverter.process.ProcessManager;
@@ -42,19 +41,19 @@ public class DefaultOfficeManagerConfiguration {
 
 
   public DefaultOfficeManagerConfiguration setOfficeHome(String officeHome) throws NullPointerException, IllegalArgumentException {
-    Objects.requireNonNull(officeHome, "officeHome must not be null");
+    requireNonNull(officeHome, "officeHome must not be null");
     return setOfficeHome(new File(officeHome));
   }
 
   public DefaultOfficeManagerConfiguration setOfficeHome(File officeHome) throws NullPointerException, IllegalArgumentException {
-    Objects.requireNonNull(officeHome, "officeHome must not be null");
+    requireNonNull(officeHome, "officeHome must not be null");
     checkArgument("officeHome", officeHome.isDirectory(), "must exist and be a directory");
     this.officeHome = officeHome;
     return this;
   }
 
   public DefaultOfficeManagerConfiguration setConnectionProtocol(OfficeConnectionProtocol connectionProtocol) throws NullPointerException {
-    Objects.requireNonNull(connectionProtocol, "connectionProtocol must not be null");
+    requireNonNull(connectionProtocol, "connectionProtocol must not be null");
     this.connectionProtocol = connectionProtocol;
     return this;
   }
@@ -65,20 +64,20 @@ public class DefaultOfficeManagerConfiguration {
   }
 
   public DefaultOfficeManagerConfiguration setPortNumbers(int... portNumbers) throws NullPointerException, IllegalArgumentException {
-    Objects.requireNonNull(portNumbers, "portNumbers must not be null");
+    requireNonNull(portNumbers, "portNumbers must not be null");
     checkArgument("portNumbers", portNumbers.length > 0, "must not be empty");
     this.portNumbers = portNumbers;
     return this;
   }
 
   public DefaultOfficeManagerConfiguration setPipeName(String pipeName) throws NullPointerException {
-    Objects.requireNonNull(pipeName, "pipeName must not be null");
+    requireNonNull(pipeName, "pipeName must not be null");
     this.pipeNames = new String[] { pipeName };
     return this;
   }
 
   public DefaultOfficeManagerConfiguration setPipeNames(String... pipeNames) throws NullPointerException, IllegalArgumentException {
-    Objects.requireNonNull(pipeNames, "pipeNames must not be null");
+    requireNonNull(pipeNames, "pipeNames must not be null");
     checkArgument("pipeNames", pipeNames.length > 0, "must not be empty");
     this.pipeNames = pipeNames;
     return this;
@@ -107,7 +106,7 @@ public class DefaultOfficeManagerConfiguration {
    * @return
    */
   public DefaultOfficeManagerConfiguration setWorkDir(File workDir) {
-    Objects.requireNonNull(workDir, "workDir must not be null");
+    requireNonNull(workDir, "workDir must not be null");
     this.workDir = workDir;
     return this;
   }
@@ -139,7 +138,7 @@ public class DefaultOfficeManagerConfiguration {
    * @throws NullPointerException
    */
   public DefaultOfficeManagerConfiguration setProcessManager(ProcessManager processManager) throws NullPointerException {
-    Objects.requireNonNull(processManager, "processManager must not be null");
+    requireNonNull(processManager, "processManager must not be null");
     this.processManager = processManager;
     return this;
   }
@@ -241,6 +240,13 @@ public class DefaultOfficeManagerConfiguration {
 
   private boolean isValidProfileDir(File profileDir) {
     return new File(profileDir, "user").isDirectory();
+  }
+
+  // Objects.requireNonNull(T, String) fallback for JDK < 1.7
+  private static <T> T requireNonNull( T obj, String message) {
+    if ( obj == null)
+      throw new NullPointerException( message);
+      return obj;
   }
 
 }
