@@ -53,7 +53,7 @@
     <repository>
       <!-- Made on purpose for LibreOffice 4.2.6-secfix jars, using maven install-file plugin -->
       <id>uno-local-repo</id>
-      <url>file://${basedir}/src/main/resources/uno-repo/</url>
+      <url>file://${basedir}/extra/uno-repo/</url>
     </repository>
     <repository>
       <!-- required for org.hyperic:sigar -->
