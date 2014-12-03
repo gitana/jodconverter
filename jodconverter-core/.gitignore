@@ -1,1 +1,10 @@
-/notes-to-self.txt
+# generic files
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
+
+# Java
+*.class
+hs_err_pid*

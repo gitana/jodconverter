@@ -51,9 +51,9 @@
 
   <repositories>
     <repository>
-      <!-- Made on purpose for LibreOffice 4.2.6-secfix jars, using maven install-file plugin -->
+      <!-- Made on purpose for LibreOffice 4.3.5 jars, using maven install-file plugin -->
       <id>uno-local-repo</id>
-      <url>file://${basedir}/src/main/resources/uno-repo/</url>
+      <url>file://${basedir}/extra/uno-repo/</url>
     </repository>
     <repository>
       <!-- required for org.hyperic:sigar -->
@@ -81,32 +81,32 @@
     <dependency>
       <groupId>org.libreoffice</groupId>
       <artifactId>ridl</artifactId>
-      <version>4.2.6-secfix</version>
+      <version>4.3.5</version>
     </dependency>
     <dependency>
       <groupId>org.libreoffice</groupId>
       <artifactId>juh</artifactId>
-      <version>4.2.6-secfix</version>
+      <version>4.3.5</version>
     </dependency>
     <dependency>
       <groupId>org.libreoffice</groupId>
       <artifactId>jurt</artifactId>
-      <version>4.2.6-secfix</version>
+      <version>4.3.5</version>
     </dependency>
     <dependency>
       <groupId>org.libreoffice</groupId>
       <artifactId>unoil</artifactId>
-      <version>4.2.6-secfix</version>
+      <version>4.3.5</version>
     </dependency>
     <dependency>
       <groupId>org.libreoffice</groupId>
       <artifactId>java_uno</artifactId>
-      <version>4.2.6-secfix</version>
+      <version>4.3.5</version>
     </dependency>
     <dependency>
       <groupId>org.libreoffice</groupId>
       <artifactId>unoloader</artifactId>
-      <version>4.2.6-secfix</version>
+      <version>4.3.5</version>
     </dependency>
 
     <dependency>
