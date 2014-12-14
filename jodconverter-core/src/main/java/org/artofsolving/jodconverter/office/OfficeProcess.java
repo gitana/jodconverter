@@ -60,7 +60,8 @@ class OfficeProcess {
   }
 
   public void start(boolean restart) throws IOException {
-    final ProcessQuery processQuery = new ProcessQuery("soffice.bin", this.unoUrl.getAcceptString());
+    String processName = OfficeUtils.getProcessName(this.officeHome);
+    final ProcessQuery processQuery = new ProcessQuery(processName, this.unoUrl.getAcceptString());
     long foundPid = this.processManager.findPid(processQuery);
     if (!(foundPid == PID_NOT_FOUND || foundPid == PID_UNKNOWN)) {
       throw new IllegalStateException(String.format("a process with acceptString '%s' is already running; pid %d",
@@ -240,7 +241,8 @@ class OfficeProcess {
   public int forciblyTerminate(long retryInterval, long retryTimeout) throws IOException, RetryTimeoutException {
     LOG.info("trying to forcibly terminate process: '{}' (pid: {})", this.unoUrl, (this.pid != PID_UNKNOWN ? this.pid : "PID_UNKNOWN"));
     if (this.pid == PID_UNKNOWN) {
-      long foundPid = this.processManager.findPid(new ProcessQuery("soffice.*", this.unoUrl.getAcceptString()));
+      String processName = OfficeUtils.getProcessName(this.officeHome);
+      long foundPid = this.processManager.findPid(new ProcessQuery(processName, this.unoUrl.getAcceptString()));
       try {
         this.processManager.kill(this.process, foundPid);
       } catch (IllegalArgumentException ex) {

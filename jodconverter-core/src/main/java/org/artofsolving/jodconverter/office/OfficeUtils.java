@@ -120,4 +120,9 @@ public class OfficeUtils {
       return new File(officeHome, "program/soffice.bin");
     }
   }
+
+  public static String getProcessName(File officeHome)
+  {
+    return getOfficeExecutable(officeHome).getName();
+  }
 }
