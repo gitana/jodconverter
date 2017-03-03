@@ -6,7 +6,7 @@
 
   <groupId>org.artofsolving.jodconverter</groupId>
   <artifactId>jodconverter-core</artifactId>
-  <version>3.0-CLOUDCMS-SNAPSHOT</version>
+  <version>3.1-CLOUDCMS-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>JODConverter - Core Library</name>
@@ -47,14 +47,21 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <libreoffice.version>5.2.0</libreoffice.version>
+    <!--
+    <libreoffice.version>4.3.5</libreoffice.version>
+        -->
+    
   </properties>
 
   <repositories>
+    <!-- Made on purpose for LibreOffice 4.3.5 jars, using maven install-file plugin -->
+    <!--
     <repository>
-      <!-- Made on purpose for LibreOffice 4.3.5 jars, using maven install-file plugin -->
       <id>uno-local-repo</id>
-      <url>file://${basedir}/extra/uno-repo/</url>
+      <url>file://${}/extra/uno-repo/</url>
     </repository>
+    -->
     <repository>
       <!-- required for org.hyperic:sigar -->
       <id>jboss-public-repository-group</id>
@@ -81,32 +88,34 @@
     <dependency>
       <groupId>org.libreoffice</groupId>
       <artifactId>ridl</artifactId>
-      <version>4.3.5</version>
+      <version>${libreoffice.version}</version>
     </dependency>
     <dependency>
       <groupId>org.libreoffice</groupId>
       <artifactId>juh</artifactId>
-      <version>4.3.5</version>
+      <version>${libreoffice.version}</version>
     </dependency>
     <dependency>
       <groupId>org.libreoffice</groupId>
       <artifactId>jurt</artifactId>
-      <version>4.3.5</version>
+      <version>${libreoffice.version}</version>
     </dependency>
     <dependency>
       <groupId>org.libreoffice</groupId>
       <artifactId>unoil</artifactId>
-      <version>4.3.5</version>
+      <version>${libreoffice.version}</version>
     </dependency>
+    <!--
     <dependency>
       <groupId>org.libreoffice</groupId>
       <artifactId>java_uno</artifactId>
-      <version>4.3.5</version>
+      <version>${libreoffice.version}</version>
     </dependency>
+    -->
     <dependency>
       <groupId>org.libreoffice</groupId>
       <artifactId>unoloader</artifactId>
-      <version>4.3.5</version>
+      <version>${libreoffice.version}</version>
     </dependency>
 
     <dependency>
@@ -220,6 +229,13 @@
         </configuration>
       </plugin>
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh-external</artifactId>
+        <version>2.6</version>
+      </extension>
+    </extensions>          
   </build>
 
   <reporting>
@@ -236,5 +252,5 @@
       </plugin>
     </plugins>
   </reporting>
-
+  
 </project>
